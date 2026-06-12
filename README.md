@@ -10,39 +10,46 @@ staymanager/
 ├── css/
 │   └── styles.css      ← All styling (light + dark theme)
 ├── js/
-│   └── app.js          ← All application logic (React/JSX)
+│   └── app.js          ← App logic, precompiled to plain JS (what the browser runs)
+├── src/
+│   └── app.jsx         ← Readable JSX source (edit this, then recompile)
 ├── assets/
 │   └── login-bg.jpg    ← Login page background photo (see note below)
 └── README.md
 ```
 
-No build step. React, ReactDOM, and Babel are loaded from CDN and the JSX is compiled in the browser.
+The JSX in `src/app.jsx` is precompiled into plain JavaScript at `js/app.js`, so the browser needs **no Babel and no build tools** to run the app.
 
 ## Running it
 
-⚠️ Because `app.js` is loaded as an external Babel script, opening `index.html` directly from disk (`file://`) **won't work** — browsers block it for security (CORS). You must serve it over HTTP. Any of these works:
-
-```bash
-# Python (built into most systems)
-python -m http.server 8000
-
-# Node
-npx serve
-```
-
-Then open `http://localhost:8000`.
+Just open `index.html` — double-clicking it works. An internet connection is needed only for the React CDN scripts and Google Fonts.
 
 ## Deploying to GitHub Pages
 
 1. Push this folder to a GitHub repository.
 2. Repo → **Settings → Pages** → Source: **Deploy from a branch** → branch `main`, folder `/ (root)`.
-3. Your app is live at `https://<username>.github.io/<repo>/` — GitHub serves `index.html` automatically and it loads the CSS/JS files alongside it.
+3. Your app is live at `https://<username>.github.io/<repo>/`.
+
+## Making changes
+
+- **CSS:** edit `css/styles.css` directly.
+- **Logic/UI:** edit `src/app.jsx` (readable JSX), then recompile it to `js/app.js`. Any JSX compiler works; the simplest options:
+
+```bash
+# Option A — esbuild (fastest)
+npx esbuild src/app.jsx --jsx=transform --target=es2017 --outfile=js/app.js
+
+# Option B — TypeScript compiler
+npx tsc src/app.jsx --jsx react --target es2017 --lib es2017,dom --allowJs --outFile js/app.js
+```
+
+(You can also edit `js/app.js` directly — it's valid plain JS — but keeping changes in `src/app.jsx` is cleaner.)
 
 ## Login background image
 
-The original single-file version embedded the login photo as base64 inside the HTML. In this structure it's a proper image file at `assets/login-bg.jpg`. If the file is missing, a navy/gold gradient fallback is shown instead — the app still works.
+The original single-file version embedded the login photo as base64 inside the HTML. In this structure it's a proper image file at `assets/login-bg.jpg`. If the file is missing, a navy/gold gradient fallback shows instead — the app still works.
 
-To extract the photo from your old single-file `staymanager.html`, run this once:
+To extract the photo from your old single-file HTML, run this once:
 
 ```python
 import re, base64
@@ -55,12 +62,12 @@ Or simply drop any photo of your property at `assets/login-bg.jpg`.
 
 ## Default logins
 
-| Role  | Email                      | Password          |
-|-------|----------------------------|-------------------|
-| Admin | miguel@staymanager.com     | `D0022b0c0cf53@$` |
-| Staff | desk@staymanager.com       | `desk123`         |
+| Role  | Email                  | Password          |
+|-------|------------------------|-------------------|
+| Admin | miguel@staymanager.com | `D0022b0c0cf53@$` |
+| Staff | desk@staymanager.com   | `desk123`         |
 
-> ⚠️ **Security note:** passwords are stored in plain text in the browser (and in the JS source). This is fine for a demo, but do not use this auth scheme for anything handling real guest data.
+> ⚠️ **Security note:** passwords are stored in plain text in the browser and in the JS source. Fine for a demo — do not use this auth scheme for real guest data.
 
 ## Data persistence
 
